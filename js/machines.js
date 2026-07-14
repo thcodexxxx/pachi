@@ -10,7 +10,7 @@ const MACHINES = {
     id: 'eva',
     name: 'e 新世紀エヴァンゲリオン 〜はじまりの記憶〜',
     maker: 'ビスティ',
-    image: 'assets/eva.svg',
+    image: 'assets/eva.png',
     typeLabel: 'ST(LT)ループ機',
     specLabel: '通常 1/399.9 / ST中 1/99.6',
 
@@ -43,7 +43,7 @@ const MACHINES = {
     id: 'sao',
     name: 'e ソードアート・オンライン 閃光の軌跡',
     maker: '京楽',
-    image: 'assets/sao.svg',
+    image: 'assets/sao.png',
     typeLabel: 'ライトミドル RUSH機',
     specLabel: '通常 1/199.9 / RUSH中実質 1/59.9',
 
