@@ -14,6 +14,10 @@ const CONFIG = {
   INVESTMENT_UNIT: 1000, // 投資単位（円）
   SPINS_PER_SECOND: 10, // ゲーム内演出速度（1秒あたりの回転数）
   WIN_DISPLAY_MS: 2500, // 大当り演出を自動で閉じるまでの時間（ミリ秒）
+  // spinsLeftの「無限（次に当たるまで終わらない）」を表すセンチネル値。
+  // JSON.stringify は Infinity を null にしてしまいlocalStorage保存後に壊れるため、
+  // 有限の整数センチネルを使う。
+  INFINITE_SPINS: -1,
 };
 
 // 1回転あたりの消費玉数 = 1,000円で借りられる玉数 ÷ 回転効率

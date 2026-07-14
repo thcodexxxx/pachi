@@ -27,8 +27,9 @@ function simulate(machineId, spins) {
   let swordTimedOut = 0; // sao: SWORD RUSH中に当たらず終了した回数
   let lightningDirectEntries = 0;
   let lightningWinEvents = 0; // LT中の当り回数(=継続分岐)
-  let lightningHighCount = 0; // sao: LIGHTNING RUSH中・10R(1500個)
-  let lightningLowCount = 0; // sao: LIGHTNING RUSH中・2R(300個)
+  let lightningInfiniteCount = 0; // sao: LIGHTNING RUSH中・10R(1500個)・無限ST(次回まで)
+  let lightningHighCount = 0; // sao: LIGHTNING RUSH中・10R(1500個)・119回転カウントダウン
+  let lightningLowCount = 0; // sao: LIGHTNING RUSH中・2R(300個)・119回転カウントダウン
   let lightningTimedOut = 0; // sao: LIGHTNING RUSH中に当たらず終了した回数
   let normalReturnCount = 0;
 
@@ -71,7 +72,8 @@ function simulate(machineId, spins) {
           else swordStayLowCount++;
         } else if (prevPhase === 'lightning') {
           lightningWinEvents++;
-          if (result.payout === 1500) lightningHighCount++;
+          if (result.next.spinsLeft === -1) lightningInfiniteCount++;
+          else if (result.payout === 1500) lightningHighCount++;
           else lightningLowCount++;
         }
       }
@@ -118,6 +120,7 @@ function simulate(machineId, spins) {
     swordContinuationRate: swordWinEvents + swordTimedOut ? swordWinEvents / (swordWinEvents + swordTimedOut) : null,
     swordUpgradeRateObserved: swordWinEvents ? (swordUpgraded / swordWinEvents) : null,
     lightningWinEvents,
+    lightningInfiniteCount,
     lightningHighCount,
     lightningLowCount,
     lightningTimedOut,
@@ -156,6 +159,8 @@ console.log('SWORD RUSH継続率(実測、RUSH状態の維持=同ティア継続
 console.log('SWORD RUSH中のLIGHTNING昇格率(実測、当り時のみ): ' + (saoResult.swordUpgradeRateObserved * 100).toFixed(2) + '% (仕様: 30%)');
 console.log('  SWORD RUSH継続時の内訳 10R(1500個)(実測): ' + ((saoResult.swordStayHighCount / (saoResult.swordStayHighCount + saoResult.swordStayLowCount)) * 100).toFixed(2) + '% (仕様: 40/(40+30)=57.14%)');
 console.log('LIGHTNING RUSH継続率(実測): ' + (saoResult.lightningContinuationRate * 100).toFixed(2) + '% (仕様目安: 約90%相当)');
-console.log('  LIGHTNING RUSH中の内訳 10R(1500個)(実測): ' + ((saoResult.lightningHighCount / saoResult.lightningWinEvents) * 100).toFixed(2) + '% (仕様: 70%)');
+console.log('  LIGHTNING RUSH中の内訳 無限ST/次回まで(実測): ' + ((saoResult.lightningInfiniteCount / saoResult.lightningWinEvents) * 100).toFixed(2) + '% (仕様: 22.5%)');
+console.log('  LIGHTNING RUSH中の内訳 10R(1500個)・119回転(実測): ' + ((saoResult.lightningHighCount / saoResult.lightningWinEvents) * 100).toFixed(2) + '% (仕様: 47.5%)');
+console.log('  LIGHTNING RUSH中の内訳 2R(300個)・119回転(実測): ' + ((saoResult.lightningLowCount / saoResult.lightningWinEvents) * 100).toFixed(2) + '% (仕様: 30%)');
 
 console.log('\n完了。');

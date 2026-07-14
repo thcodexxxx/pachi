@@ -13,8 +13,12 @@
   // Node側だけ別名で受け取り、ブラウザ側は下の M() 内で外側スコープの
   // bare な MACHINES 識別子（machines.jsが定義）を直接参照する。
   const NODE_MACHINES = isNode ? require('./machines.js').MACHINES : null;
+  const NODE_CONFIG = isNode ? require('./config.js').CONFIG : null;
   function M() {
     return isNode ? NODE_MACHINES : MACHINES;
+  }
+  function C() {
+    return isNode ? NODE_CONFIG : CONFIG;
   }
 
   function randomFloat() {
@@ -112,8 +116,21 @@
 
     if (phase === 'lightning') {
       if (hit(m.odds.rush)) {
-        const payout = randomFloat() < m.lightning.highRate ? m.payout.lightningWinHigh : m.payout.lightningWinLow;
+        // 無限ST(次回まで) / 119回転カウントダウン・10R / 119回転カウントダウン・2R の3択
+        const r = randomFloat();
+        if (r < m.lightning.infiniteRate) {
+          return {
+            win: true,
+            payout: m.payout.lightningWinHigh,
+            next: { phase: 'lightning', spinsLeft: C().INFINITE_SPINS },
+          };
+        }
+        const payout = r < m.lightning.infiniteRate + m.lightning.highRate ? m.payout.lightningWinHigh : m.payout.lightningWinLow;
         return { win: true, payout, next: { phase: 'lightning', spinsLeft: m.lightningSpins } };
+      }
+      if (phaseState.spinsLeft === C().INFINITE_SPINS) {
+        // 無限ST中はハズレても終了しない
+        return { win: false, payout: 0, next: { phase: 'lightning', spinsLeft: C().INFINITE_SPINS } };
       }
       const spinsLeft = phaseState.spinsLeft - 1;
       const next = spinsLeft <= 0 ? { phase: 'normal', spinsLeft: null } : { phase: 'lightning', spinsLeft };

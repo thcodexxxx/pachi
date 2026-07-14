@@ -52,7 +52,8 @@ const Counter = {
     if (session.phaseState.spinsLeft !== null && session.phaseState.spinsLeft !== undefined) {
       e.stPanel.classList.remove('hidden');
       e.stLabel.textContent = '残り' + getPhaseLabel(session.machineId, session.phaseState.phase);
-      e.stValue.textContent = formatNum(session.phaseState.spinsLeft);
+      e.stValue.textContent =
+        session.phaseState.spinsLeft === CONFIG.INFINITE_SPINS ? '∞' : formatNum(session.phaseState.spinsLeft);
     } else {
       e.stPanel.classList.add('hidden');
     }
