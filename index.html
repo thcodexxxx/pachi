@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>パチンコ実戦シミュレーター</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <div class="app-title">パチンコ実戦シミュレーター</div>
+
+  <div id="player-bar" class="player-bar hidden">
+    <span>所持金 <span class="value" id="bar-cash">0</span>円</span>
+    <span>持ち玉 <span class="value" id="bar-balls">0</span>玉</span>
+  </div>
+
+  <!-- 1. タイトル/ホール入店画面 -->
+  <section id="screen-title" class="screen">
+    <div class="stat-panel">
+      <div class="stat-grid">
+        <div class="stat-cell">
+          <span class="stat-label">所持金</span>
+          <span class="stat-value digit-num" id="title-cash">0</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-label">持ち玉</span>
+          <span class="stat-value green digit-num" id="title-balls">0</span>
+        </div>
+      </div>
+    </div>
+    <button id="btn-to-select" class="btn btn-primary">台を選ぶ</button>
+    <button id="btn-reset-all" class="btn">所持金・記録をリセットする</button>
+    <footer class="note">数値のみのシミュレーションです。実際の遊技結果を保証するものではありません。</footer>
+  </section>
+
+  <!-- 2. 台選択画面 -->
+  <section id="screen-select" class="screen">
+    <h2>台を選択してください</h2>
+    <div class="machine-list" id="machine-list"></div>
+    <button id="btn-select-back" class="btn">戻る</button>
+  </section>
+
+  <!-- 3. 投資設定画面 -->
+  <section id="screen-invest" class="screen">
+    <h2 id="invest-machine-name">機種名</h2>
+    <div class="invest-form">
+      <div class="field-block">
+        <label for="invest-balls-range">使用する持ち玉数（所持: <span id="invest-max-balls">0</span>玉）</label>
+        <input type="range" id="invest-balls-range" min="0" max="0" step="1" value="0">
+        <input type="number" id="invest-balls-number" min="0" max="0" step="1" value="0">
+      </div>
+      <div class="field-block">
+        <label for="invest-cash-number">現金投資額（1,000円単位）</label>
+        <input type="number" id="invest-cash-number" min="0" step="1000" value="0">
+        <div class="btn-row">
+          <button class="btn btn-invest-add" data-yen="1000">+1,000円</button>
+          <button class="btn btn-invest-add" data-yen="5000">+5,000円</button>
+          <button class="btn btn-invest-add" data-yen="10000">+10,000円</button>
+        </div>
+      </div>
+      <div class="invest-summary">
+        投入合計玉数: <strong id="invest-total-balls">0</strong>玉
+      </div>
+      <div class="btn-row">
+        <button id="btn-invest-start" class="btn btn-primary">遊戯開始</button>
+        <button id="btn-invest-back" class="btn">戻る</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 遊戯画面 -->
+  <section id="screen-play" class="screen">
+    <h2 id="play-machine-name">機種名</h2>
+
+    <div id="st-panel" class="st-panel hidden">
+      <span class="stat-label" id="st-label">残りST</span>
+      <span class="stat-value digit-num" id="st-value">0</span>
+    </div>
+
+    <div class="stat-panel">
+      <div class="stat-grid">
+        <div class="stat-cell">
+          <span class="stat-label">回転数（大当り後）</span>
+          <span class="stat-value digit-num" id="play-spins-since-win">0</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-label">総回転数</span>
+          <span class="stat-value digit-num" id="play-total-spins">0</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-label">本日の大当り回数</span>
+          <span class="stat-value digit-num" id="play-win-count">0</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-label">持ち玉</span>
+          <span class="stat-value green digit-num" id="play-balls">0</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-label">残り現金</span>
+          <span class="stat-value green digit-num" id="play-cash">0</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-label">現在の状態</span>
+          <span class="stat-value small digit-num" id="play-phase">通常</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-label">実践大当り確率</span>
+          <span class="stat-value small digit-num" id="play-actual-rate">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="out-of-funds-banner" class="notice-banner hidden">
+      <span>持ち玉・残り現金が不足しています。追加投資するか、遊戯をやめてください。</span>
+      <div class="btn-row">
+        <button id="btn-add-1000-banner" class="btn btn-warn">+1,000円投資</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button id="btn-toggle-spin" class="btn btn-primary">遊戯開始</button>
+      <button id="btn-add-1000" class="btn btn-warn">+1,000円投資</button>
+      <button id="btn-quit" class="btn btn-danger">やめる（精算）</button>
+    </div>
+
+    <div class="speed-panel">
+      <span class="stat-label">回転速度</span>
+      <div class="btn-row" id="speed-buttons">
+        <button class="btn speed-btn" data-speed="5">5回/秒</button>
+        <button class="btn speed-btn" data-speed="10">10回/秒</button>
+        <button class="btn speed-btn" data-speed="20">20回/秒</button>
+        <button class="btn speed-btn" data-speed="50">50回/秒</button>
+      </div>
+    </div>
+
+    <div class="graph-panel">
+      <div class="graph-title">スランプグラフ（差玉推移）</div>
+      <canvas id="slump-graph" width="600" height="200"></canvas>
+      <div class="payout-total-row">
+        <span class="stat-label">出玉数</span>
+        <span class="stat-value green digit-num" id="play-total-payout">0</span>
+        <span class="stat-unit">玉</span>
+      </div>
+    </div>
+
+    <div class="graph-panel">
+      <div class="graph-title">大当り履歴（通常時の回転数・連チャン数）</div>
+      <canvas id="hit-history-graph" width="600" height="160"></canvas>
+    </div>
+  </section>
+
+  <!-- 5. 精算画面 -->
+  <section id="screen-settlement" class="screen">
+    <h2>精算</h2>
+    <div class="summary-list">
+      <div class="summary-row"><span>現金投資額</span><span class="value" id="settle-invested">0円</span></div>
+      <div class="summary-row"><span>大当り回数</span><span class="value" id="settle-wins">0回</span></div>
+      <div class="summary-row"><span>総回転数</span><span class="value" id="settle-spins">0回転</span></div>
+      <div class="summary-row"><span>差玉</span><span class="value" id="settle-diff">0玉</span></div>
+      <div class="summary-row"><span>現在の持ち玉</span><span class="value" id="settle-balls">0玉</span></div>
+      <div class="summary-row"><span>換金した場合の受取額</span><span class="value" id="settle-cash-value">0円</span></div>
+    </div>
+    <div class="btn-row">
+      <button id="btn-settle-exchange" class="btn btn-primary">持ち玉を換金する</button>
+      <button id="btn-settle-keep" class="btn">持ち玉のまま次の台へ</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- 大当り演出オーバーレイ -->
+<div id="win-overlay" class="win-overlay hidden">
+  <div class="win-text">大当り！</div>
+  <div class="win-payout" id="win-payout-text">+0玉</div>
+  <div class="win-hint">クリックで次へ（自動でも進みます）</div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/machines.js"></script>
+<script src="js/rng.js"></script>
+<script src="js/state.js"></script>
+<script src="js/gameEngine.js"></script>
+<script src="js/ui/counter.js"></script>
+<script src="js/ui/graph.js"></script>
+<script src="js/ui/screens.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

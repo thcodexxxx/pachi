@@ -1,0 +1,228 @@
+/* style.css — パチンコホールのデータランプ風デザイン */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #05060a;
+  --panel-bg: #0b0e14;
+  --panel-border: #2a3240;
+  --lamp-digit: #ff8a00;
+  --lamp-digit-glow: #ff8a0088;
+  --lamp-green: #39ff6a;
+  --lamp-green-glow: #39ff6a88;
+  --lamp-red: #ff3355;
+  --lamp-red-glow: #ff335588;
+  --text-main: #e8ecf4;
+  --text-dim: #8892a4;
+  --accent: #4fb2ff;
+  --accent-2: #ffd23f;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+#app {
+  width: min(560px, 100vw);
+  min-height: 100%;
+  padding: 12px 12px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hidden { display: none !important; }
+
+.screen { display: none; flex-direction: column; gap: 14px; }
+.screen.active { display: flex; }
+
+h1, h2, h3 { letter-spacing: 1px; }
+
+.app-title {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--accent-2);
+  text-shadow: 0 0 12px #ffd23f66;
+  padding: 8px 0;
+}
+
+/* ─── 数値表示（データランプ風） ─────────────────────────── */
+.digit-num {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-cell {
+  background: #000;
+  border: 1px solid #1d2430;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  color: var(--lamp-digit);
+  text-shadow: 0 0 8px var(--lamp-digit-glow);
+}
+
+.stat-value.green { color: var(--lamp-green); text-shadow: 0 0 8px var(--lamp-green-glow); }
+.stat-value.small { font-size: 1.1rem; }
+
+.st-panel {
+  background: #140505;
+  border: 1px solid #4a1a26;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.st-panel .stat-label { color: #ff9aac; }
+.st-panel .stat-value { color: var(--lamp-red); text-shadow: 0 0 10px var(--lamp-red-glow); font-size: 1.8rem; }
+
+/* ─── ボタン ─────────────────────────────────────────── */
+.btn {
+  background: #1a2230;
+  color: var(--text-main);
+  border: 1px solid #2f3b4d;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter .15s, transform .05s;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.25); }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn-primary { background: linear-gradient(#3d8bff, #1a5fd6); border-color: #5a9dff; }
+.btn-danger { background: linear-gradient(#ff5a5a, #c62828); border-color: #ff8a8a; }
+.btn-warn { background: linear-gradient(#ffb23f, #d68400); border-color: #ffd07a; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-row .btn { flex: 1; min-width: 110px; }
+
+/* ─── 台選択カード ───────────────────────────────────── */
+.machine-list { display: flex; flex-direction: column; gap: 14px; }
+.machine-card {
+  display: flex;
+  gap: 14px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  align-items: center;
+}
+.machine-card:hover { border-color: var(--accent); }
+.machine-card img { width: 90px; height: auto; border-radius: 6px; flex-shrink: 0; }
+.machine-card .info { display: flex; flex-direction: column; gap: 4px; }
+.machine-card .name { font-weight: 800; font-size: 1.02rem; }
+.machine-card .maker { font-size: 0.78rem; color: var(--text-dim); }
+.machine-card .spec { font-size: 0.85rem; color: var(--accent-2); }
+.machine-card .type { font-size: 0.78rem; color: var(--text-dim); }
+
+/* ─── 投資設定画面 ───────────────────────────────────── */
+.invest-form { display: flex; flex-direction: column; gap: 16px; }
+.field-block { display: flex; flex-direction: column; gap: 8px; }
+.field-block label { font-size: 0.85rem; color: var(--text-dim); }
+input[type="range"] { width: 100%; }
+input[type="number"] {
+  background: #000; color: var(--lamp-digit); border: 1px solid #2a3240; border-radius: 6px;
+  padding: 8px 10px; font-family: 'Consolas', monospace; font-size: 1rem; width: 100%;
+}
+.invest-summary { font-size: 0.9rem; color: var(--text-dim); }
+.invest-summary strong { color: var(--text-main); }
+
+/* ─── 遊戯画面：大当り演出 ───────────────────────────── */
+.win-overlay {
+  position: fixed; inset: 0; background: #000000cc;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; z-index: 200; cursor: pointer;
+}
+.win-overlay .win-text {
+  font-size: 3rem; font-weight: 900; color: #ff3355;
+  text-shadow: 0 0 20px #ff3355, 0 0 40px #ff335588;
+  animation: winBlink 0.5s infinite alternate;
+}
+.win-overlay .win-payout {
+  font-size: 1.8rem; font-weight: 800; color: var(--lamp-digit);
+  text-shadow: 0 0 14px var(--lamp-digit-glow);
+}
+.win-overlay .win-hint { font-size: 0.85rem; color: var(--text-dim); }
+@keyframes winBlink {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0.7; transform: scale(1.05); }
+}
+
+/* ─── 玉切れ・現金切れモーダル ───────────────────────── */
+.notice-banner {
+  background: #2a1010; border: 1px solid #ff3355; border-radius: 8px;
+  padding: 10px 14px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;
+}
+
+/* ─── スランプグラフ ─────────────────────────────────── */
+.graph-panel { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px; padding: 10px; }
+.graph-title { font-size: 0.78rem; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 6px; }
+#slump-graph { width: 100%; height: 200px; display: block; background: #000; border-radius: 6px; }
+.payout-total-row { display: flex; align-items: baseline; gap: 8px; padding: 10px 4px 2px; }
+.payout-total-row .stat-value { font-size: 1.3rem; }
+.stat-unit { font-size: 0.8rem; color: var(--text-dim); }
+#hit-history-graph { width: 100%; height: 160px; display: block; background: #000; border-radius: 6px; }
+
+/* ─── 回転速度パネル ─────────────────────────────────── */
+.speed-panel { display: flex; flex-direction: column; gap: 6px; }
+.speed-btn { flex: 1; min-width: 70px; padding: 8px 6px; font-size: 0.85rem; }
+.speed-btn.active { background: linear-gradient(#3d8bff, #1a5fd6); border-color: #5a9dff; }
+
+/* ─── 精算画面 ───────────────────────────────────────── */
+.summary-list { display: flex; flex-direction: column; gap: 8px; }
+.summary-row { display: flex; justify-content: space-between; font-size: 0.95rem; padding: 6px 0; border-bottom: 1px dashed #232b38; }
+.summary-row .value { font-family: 'Consolas', monospace; color: var(--lamp-digit); }
+
+/* ─── ヘッダー共通（所持金・持ち玉） ─────────────────── */
+.player-bar {
+  display: flex; justify-content: space-between; gap: 10px;
+  background: #000; border: 1px solid #1d2430; border-radius: 8px; padding: 8px 12px;
+  font-size: 0.85rem; color: var(--text-dim);
+}
+.player-bar .value { color: var(--lamp-green); font-family: 'Consolas', monospace; font-weight: 700; }
+
+footer.note { text-align: center; font-size: 0.7rem; color: #444d5c; padding-top: 8px; }
+
+@media (max-width: 420px) {
+  .machine-card { flex-direction: column; align-items: flex-start; }
+  .machine-card img { width: 100%; max-width: 160px; }
+}

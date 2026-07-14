@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 480" width="260" height="480">
+  <defs>
+    <linearGradient id="evaBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a1a5c"/>
+      <stop offset="100%" stop-color="#160a28"/>
+    </linearGradient>
+    <linearGradient id="evaScreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a3a2a"/>
+      <stop offset="60%" stop-color="#08140d"/>
+      <stop offset="100%" stop-color="#3a0a1a"/>
+    </linearGradient>
+    <radialGradient id="evaGlow" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#7CFC9A" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#7CFC9A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="4" y="4" width="252" height="472" rx="18" fill="url(#evaBody)" stroke="#8a4fd6" stroke-width="4"/>
+
+  <!-- 上部：抽象化した機体シルエット（版権キャラクターを模写しないシンプルな幾何形状） -->
+  <g stroke="#b98cff" stroke-width="3" fill="#241238">
+    <path d="M130 20 L165 55 L150 100 L110 100 L95 55 Z"/>
+    <path d="M70 60 L110 100 L100 140 L55 130 Z"/>
+    <path d="M190 60 L150 100 L160 140 L205 130 Z"/>
+    <circle cx="130" cy="72" r="10" fill="#7CFC9A" stroke="#2a7a4a"/>
+  </g>
+
+  <!-- 液晶画面枠 -->
+  <rect x="30" y="150" width="200" height="230" rx="6" fill="url(#evaScreen)" stroke="#5c2f8c" stroke-width="4"/>
+  <rect x="30" y="150" width="200" height="230" rx="6" fill="url(#evaGlow)"/>
+  <text x="130" y="270" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="22" font-weight="900" fill="#c8ffd8" opacity="0.85">EVA</text>
+  <text x="130" y="300" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="13" fill="#ff5c7a" opacity="0.75">ST LOOP TYPE</text>
+
+  <!-- 下部：発射装置周り -->
+  <rect x="90" y="392" width="80" height="60" rx="10" fill="#100820" stroke="#8a4fd6" stroke-width="3"/>
+  <circle cx="130" cy="422" r="18" fill="#2a1440" stroke="#b98cff" stroke-width="3"/>
+
+  <rect x="4" y="4" width="252" height="472" rx="18" fill="none" stroke="#c9a6ff" stroke-width="1" opacity="0.4"/>
+</svg>
