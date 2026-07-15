@@ -60,7 +60,8 @@
 
     if (phase === 'st') {
       if (hit(m.odds.st)) {
-        return { win: true, payout: m.payout.stWin, next: { phase: 'st', spinsLeft: m.stSpins } };
+        const payout = randomFloat() < m.st.bigRate ? m.payout.stWinBig : m.payout.stWin;
+        return { win: true, payout, next: { phase: 'st', spinsLeft: m.stSpins } };
       }
       const spinsLeft = phaseState.spinsLeft - 1;
       const next = spinsLeft <= 0 ? { phase: 'normal', spinsLeft: null } : { phase: 'st', spinsLeft };

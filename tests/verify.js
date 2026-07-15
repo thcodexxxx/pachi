@@ -14,6 +14,7 @@ function simulate(machineId, spins) {
   const firstHitTransition = {}; // 通常時からの初当り遷移先カウント
   let stEntriesFromNormalOrJitan = 0; // eva: st"突入"（直行 or 時短経由）カウント（ST内継続は含まない）
   let stContinued = 0; // eva: ST中に当って継続した回数
+  let stContinuedBig = 0; // eva: ST中の当りのうち8R×4回・約4800個だった回数
   let stTimedOut = 0; // eva: ST中に157回転以内に当たらず終了した回数
   let jitanEntries = 0;
   let jitanPulledBack = 0; // 時短中に当たってST突入した回数
@@ -56,6 +57,7 @@ function simulate(machineId, spins) {
           stEntriesFromNormalOrJitan++;
         } else if (prevPhase === 'st') {
           stContinued++;
+          if (result.payout === 4800) stContinuedBig++;
         }
       }
 
@@ -107,6 +109,7 @@ function simulate(machineId, spins) {
     stDirectBigCount,
     stDirectSmallCount,
     stContinued,
+    stContinuedBig,
     stTimedOut,
     stContinuationRate: stContinued + stTimedOut ? stContinued / (stContinued + stTimedOut) : null,
     swordEntries,
@@ -145,6 +148,7 @@ console.log('時短からの引き戻し率(実測): ' + (evaResult.jitanPullbac
 const evaTotalStEntryRate = evaResult.stEntriesFromNormalOrJitan / evaFirstHitTotal;
 console.log('トータルST突入率(実測、初当り基準): ' + (evaTotalStEntryRate * 100).toFixed(2) + '% (仕様: 約61.4%)');
 console.log('ST継続率(実測): ' + (evaResult.stContinuationRate * 100).toFixed(2) + '% (仕様: 約80%)');
+console.log('  ST中の当りの内訳 8R×4回(4800個)(実測): ' + ((evaResult.stContinuedBig / evaResult.stContinued) * 100).toFixed(3) + '% (仕様: 0.5%)');
 
 console.log('\n=== SAO 検証（' + SPINS.toLocaleString() + '回転） ===');
 const saoResult = simulate('sao', SPINS);
