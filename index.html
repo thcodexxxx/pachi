@@ -125,13 +125,12 @@
     </div>
 
     <div class="speed-panel">
-      <span class="stat-label">回転速度</span>
-      <div class="btn-row" id="speed-buttons">
-        <button class="btn speed-btn" data-speed="5">5回/秒</button>
-        <button class="btn speed-btn" data-speed="10">10回/秒</button>
-        <button class="btn speed-btn" data-speed="20">20回/秒</button>
-        <button class="btn speed-btn" data-speed="50">50回/秒</button>
+      <div class="speed-label-row">
+        <span class="stat-label">回転速度</span>
+        <span class="speed-value digit-num" id="speed-value">10</span>
+        <span class="stat-unit">回/秒</span>
       </div>
+      <input type="range" id="speed-slider" min="1" max="200" step="1" value="10">
     </div>
 
     <div class="graph-panel">
@@ -145,8 +144,10 @@
     </div>
 
     <div class="graph-panel">
-      <div class="graph-title">大当り履歴（通常時の回転数・連チャン数）</div>
-      <canvas id="hit-history-graph" width="600" height="160"></canvas>
+      <div class="graph-title">大当り履歴（最新が左／棒＝ハマり回転数・上に連チャン数・下に出玉数）</div>
+      <div class="hit-history-scroll" id="hit-history-scroll">
+        <canvas id="hit-history-graph" width="600" height="180"></canvas>
+      </div>
     </div>
   </section>
 

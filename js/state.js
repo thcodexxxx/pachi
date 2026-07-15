@@ -88,9 +88,22 @@ const GameState = {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
   },
 
-  // mutator: (data) => void — data を直接書き換える
+  // mutator: (data) => void — data を直接書き換える。保存＆再描画まで一括で行う。
   update(mutator) {
     mutator(this.data);
+    this.save();
+    this.notify();
+  },
+
+  // 状態だけ書き換え、保存・再描画はしない。高速回転時に1フレーム内で複数回転を
+  // 処理する際、1回転ごとにsave(JSON全体の直列化)とnotify(全再描画)を走らせると
+  // 重くなるため、mutateで消化して最後に flush() で1回だけ反映する用途。
+  mutate(mutator) {
+    mutator(this.data);
+  },
+
+  // mutateで溜めた変更を保存＆再描画する（1フレームに1回呼ぶ）。
+  flush() {
     this.save();
     this.notify();
   },

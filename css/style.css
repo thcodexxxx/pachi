@@ -200,12 +200,16 @@ input[type="number"] {
 .payout-total-row { display: flex; align-items: baseline; gap: 8px; padding: 10px 4px 2px; }
 .payout-total-row .stat-value { font-size: 1.3rem; }
 .stat-unit { font-size: 0.8rem; color: var(--text-dim); }
-#hit-history-graph { width: 100%; height: 160px; display: block; background: #000; border-radius: 6px; }
 
-/* ─── 回転速度パネル ─────────────────────────────────── */
+/* 大当り履歴グラフ：内側canvasを本数に応じて広げ、コンテナを横スクロールさせる */
+.hit-history-scroll { width: 100%; overflow-x: auto; background: #000; border-radius: 6px; }
+#hit-history-graph { height: 180px; display: block; }
+
+/* ─── 回転速度パネル（スライダー） ─────────────────────── */
 .speed-panel { display: flex; flex-direction: column; gap: 6px; }
-.speed-btn { flex: 1; min-width: 70px; padding: 8px 6px; font-size: 0.85rem; }
-.speed-btn.active { background: linear-gradient(#3d8bff, #1a5fd6); border-color: #5a9dff; }
+.speed-label-row { display: flex; align-items: baseline; gap: 8px; }
+.speed-value { font-size: 1.2rem; color: var(--lamp-digit); text-shadow: 0 0 8px var(--lamp-digit-glow); }
+#speed-slider { width: 100%; accent-color: var(--accent); }
 
 /* ─── 精算画面 ───────────────────────────────────────── */
 .summary-list { display: flex; flex-direction: column; gap: 8px; }

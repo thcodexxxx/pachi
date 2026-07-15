@@ -12,7 +12,8 @@ const CONFIG = {
   SPINS_PER_1000YEN: 17, // 回転効率（1,000円あたりの回転数）
   EXCHANGE_PRICE_PER_BALL: 3.5, // 換金レート（円/玉）
   INVESTMENT_UNIT: 1000, // 投資単位（円）
-  SPINS_PER_SECOND: 10, // ゲーム内演出速度（1秒あたりの回転数）
+  SPINS_PER_SECOND: 10, // ゲーム内演出速度の初期値（1秒あたりの回転数）
+  MAX_SPINS_PER_SECOND: 200, // 回転速度スライダーの上限（1秒あたりの回転数）
   WIN_DISPLAY_MS: 2500, // 大当り演出を自動で閉じるまでの時間（ミリ秒）
   // spinsLeftの「無限（次に当たるまで終わらない）」を表すセンチネル値。
   // JSON.stringify は Infinity を null にしてしまいlocalStorage保存後に壊れるため、

@@ -11,13 +11,22 @@ const Graph = {
     this.ctx = this.canvas.getContext('2d');
     this.historyCanvas = document.getElementById('hit-history-graph');
     this.historyCtx = this.historyCanvas.getContext('2d');
+    this.historyScroll = document.getElementById('hit-history-scroll');
   },
 
-  // Retina対応：CSS表示サイズに対して実ピクセルを合わせ、{w, h}(CSSピクセル単位)を返す
-  _prepareCanvas(canvas, ctx) {
-    const cssWidth = canvas.clientWidth || 600;
-    const cssHeight = canvas.clientHeight || 200;
+  // Retina対応：CSS表示サイズに対して実ピクセルを合わせ、{w, h}(CSSピクセル単位)を返す。
+  // cssWidth/cssHeight を明示指定した場合はそのサイズでcanvasを構成する（履歴グラフの
+  // 横スクロール用に、本数に応じてcanvasを広げる目的で使う）。
+  _prepareCanvas(canvas, ctx, explicitWidth, explicitHeight) {
+    const cssWidth = explicitWidth || canvas.clientWidth || 600;
+    const cssHeight = explicitHeight || canvas.clientHeight || 200;
     const dpr = window.devicePixelRatio || 1;
+    // 明示サイズ指定時（履歴グラフ）だけインラインstyleでcanvasを広げる。
+    // スランプグラフはCSSの width:100% を維持したいので触らない。
+    if (explicitWidth) {
+      canvas.style.width = cssWidth + 'px';
+      canvas.style.height = cssHeight + 'px';
+    }
     if (canvas.width !== Math.round(cssWidth * dpr) || canvas.height !== Math.round(cssHeight * dpr)) {
       canvas.width = Math.round(cssWidth * dpr);
       canvas.height = Math.round(cssHeight * dpr);
@@ -104,19 +113,21 @@ const Graph = {
     ctx.fillText(maxSpin.toLocaleString('ja-JP') + '回転', w - padding.right, h - 4);
   },
 
-  // 大当り履歴（通常時から何回転で当たったか／何連チャンしたか）を棒グラフで描画
+  // 大当り履歴を棒グラフで描画。
+  // ・1本＝1スプリー（初当り〜連チャン終了）。棒の高さ＝そこまでのハマり回転数。
+  // ・最新が一番左（履歴配列を反転して左から描画）。
+  // ・棒の上に連チャン数バッジ、棒の下にそのスプリーの出玉数。
+  // ・全件を描画し、本数に応じてcanvasを横に広げてコンテナ側で横スクロールさせる。
   renderHistory(session) {
     if (!this.historyCtx) return;
     const ctx = this.historyCtx;
-    const { w, h } = this._prepareCanvas(this.historyCanvas, ctx);
+    const canvasH = 180;
 
     const history = (session && session.hitHistory) || [];
-    // ラベル用に上部を2行分（連チャンバッジ＋回転数）確保し、棒グラフの高さには影響させない
-    const padding = { top: 34, right: 10, bottom: 20, left: 10 };
-    const plotW = w - padding.left - padding.right;
-    const plotH = h - padding.top - padding.bottom;
+    const containerW = (this.historyScroll && this.historyScroll.clientWidth) || 600;
 
     if (history.length === 0) {
+      const { w, h } = this._prepareCanvas(this.historyCanvas, ctx, containerW, canvasH);
       ctx.fillStyle = '#8892a4';
       ctx.font = '12px Consolas, monospace';
       ctx.textAlign = 'center';
@@ -124,35 +135,46 @@ const Graph = {
       return;
     }
 
-    // 直近N件だけ表示（多すぎると1本あたりが細くなりすぎるため）
-    const MAX_BARS = 20;
-    const shown = history.slice(-MAX_BARS);
-    const maxSpinsToHit = Math.max(1, ...shown.map((s) => s.spinsToHit));
+    // 最新を左に。履歴は古い順に積まれるので反転する。
+    const ordered = history.slice().reverse();
 
-    const barGap = 6;
-    const barWidth = Math.max(6, (plotW - barGap * (shown.length - 1)) / shown.length);
+    const padding = { top: 32, right: 12, bottom: 24, left: 12 };
+    const barWidth = 40;
+    const barGap = 10;
+    // 本数ぶんの幅。コンテナ幅より狭ければコンテナ幅いっぱいに合わせる。
+    const contentW = padding.left + padding.right + ordered.length * barWidth + (ordered.length - 1) * barGap;
+    const cssWidth = Math.max(containerW, contentW);
+
+    const { h } = this._prepareCanvas(this.historyCanvas, ctx, cssWidth, canvasH);
+    const plotH = h - padding.top - padding.bottom;
+    const maxSpinsToHit = Math.max(1, ...ordered.map((s) => s.spinsToHit));
 
     ctx.textAlign = 'center';
-    shown.forEach((spree, i) => {
+    ordered.forEach((spree, i) => {
       const x = padding.left + i * (barWidth + barGap);
       const barH = Math.max(2, (spree.spinsToHit / maxSpinsToHit) * plotH);
       const y = padding.top + (plotH - barH);
+      const centerX = x + barWidth / 2;
       const isChain = spree.chainCount >= 2;
 
       ctx.fillStyle = isChain ? '#ffb23f' : '#4fb2ff';
       ctx.fillRect(x, y, barWidth, barH);
 
-      // ラベルは棒の高さに関わらず固定の2行（連チャンバッジ／回転数）に描画し、
-      // 背の高い棒でも文字同士が重ならないようにする
-      const centerX = x + barWidth / 2;
+      // 上段：連チャン数バッジ（2連以上）
       if (isChain) {
         ctx.fillStyle = '#ff3355';
-        ctx.font = 'bold 10px Consolas, monospace';
-        ctx.fillText(spree.chainCount + '連', centerX, 12);
+        ctx.font = 'bold 11px Consolas, monospace';
+        ctx.fillText(spree.chainCount + '連', centerX, 13);
       }
+      // 中段：ハマり回転数（棒の頭のすぐ上に固定行として）
       ctx.fillStyle = '#c8d0dc';
       ctx.font = '9px Consolas, monospace';
-      ctx.fillText(String(spree.spinsToHit), centerX, padding.top - 4);
+      ctx.fillText(String(spree.spinsToHit), centerX, padding.top - 5);
+
+      // 下段：そのスプリーの出玉数
+      ctx.fillStyle = '#39ff6a';
+      ctx.font = 'bold 10px Consolas, monospace';
+      ctx.fillText((spree.totalPayout || 0).toLocaleString('ja-JP'), centerX, h - 8);
     });
   },
 };

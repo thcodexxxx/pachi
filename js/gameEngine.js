@@ -89,7 +89,7 @@ const GameEngine = {
 
   // 遊戯中でも呼べる：回転速度を変更する（次のループのフレームから反映）
   setSpeed(spinsPerSecond) {
-    spinsPerSecond = Math.max(1, Math.floor(spinsPerSecond || 0));
+    spinsPerSecond = Math.min(CONFIG.MAX_SPINS_PER_SECOND, Math.max(1, Math.floor(spinsPerSecond || 0)));
     GameState.update((d) => {
       d.settings.spinsPerSecond = spinsPerSecond;
     });
@@ -155,12 +155,16 @@ const GameEngine = {
       // 1フレームで消化する回転数の上限。intervalが短い（高速設定）ほど、
       // 同じ絶対時間分の遅れを取り戻すのに必要な回数が増えるため、intervalに応じて広げる。
       const maxCatchUp = Math.max(10, Math.ceil(MAX_DRIFT_MS / interval));
+      let spun = 0;
       while (now - this._lastSpinTime >= interval && guard < maxCatchUp) {
         this._lastSpinTime += interval;
         const shouldContinue = this._executeSpin();
         guard++;
+        spun++;
         if (!shouldContinue) break;
       }
+      // 1フレームで消化した複数回転ぶんの保存＆再描画をまとめて1回だけ行う（高速時の負荷軽減）。
+      if (spun > 0) GameState.flush();
       const after = GameState.data;
       if (after.session && after.session.isSpinning && !after.session.pendingWin) {
         this._rafId = requestAnimationFrame(step);
@@ -172,10 +176,11 @@ const GameEngine = {
   },
 
   // 1回転実行。falseを返した場合はその場でループを止めるべき状態(大当り演出/玉切れ)になったことを示す。
+  // 保存・再描画はしない（呼び出し側が1フレームに1回 GameState.flush() する）。
   _executeSpin() {
     let stopReason = null; // 'win' | 'outOfFunds' | null
 
-    GameState.update((d) => {
+    GameState.mutate((d) => {
       const session = d.session;
       if (!session) return;
       const machineId = session.machineId;

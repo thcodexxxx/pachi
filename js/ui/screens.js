@@ -35,7 +35,7 @@ const Screens = {
       btnAdd1000: document.getElementById('btn-add-1000'),
       btnAdd1000Banner: document.getElementById('btn-add-1000-banner'),
       btnQuit: document.getElementById('btn-quit'),
-      speedButtons: Array.from(document.querySelectorAll('.speed-btn')),
+      speedSlider: document.getElementById('speed-slider'),
 
       settleInvested: document.getElementById('settle-invested'),
       settleWins: document.getElementById('settle-wins'),
@@ -152,9 +152,7 @@ const Screens = {
 
     e.btnQuit.addEventListener('click', () => GameEngine.endSession());
 
-    e.speedButtons.forEach((btn) => {
-      btn.addEventListener('click', () => GameEngine.setSpeed(Number(btn.dataset.speed)));
-    });
+    e.speedSlider.addEventListener('input', () => GameEngine.setSpeed(Number(e.speedSlider.value)));
 
     e.btnSettleExchange.addEventListener('click', () => GameEngine.settleExchange());
     e.btnSettleKeep.addEventListener('click', () => GameEngine.settleKeepBalls());

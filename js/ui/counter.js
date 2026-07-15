@@ -25,7 +25,8 @@ const Counter = {
       toggleSpinBtn: document.getElementById('btn-toggle-spin'),
       winOverlay: document.getElementById('win-overlay'),
       winPayoutText: document.getElementById('win-payout-text'),
-      speedButtons: Array.from(document.querySelectorAll('.speed-btn')),
+      speedSlider: document.getElementById('speed-slider'),
+      speedValue: document.getElementById('speed-value'),
     };
   },
 
@@ -45,9 +46,10 @@ const Counter = {
     e.playActualRate.textContent = session.winCount > 0 ? '1/' + (session.totalSpins / session.winCount).toFixed(1) : '-';
     e.playTotalPayout.textContent = formatNum(session.totalPayoutBalls);
 
-    e.speedButtons.forEach((btn) => {
-      btn.classList.toggle('active', Number(btn.dataset.speed) === state.settings.spinsPerSecond);
-    });
+    // 速度スライダー：状態値と表示・つまみ位置を同期（ドラッグ中の再設定は同値なら害なし）
+    const speed = state.settings.spinsPerSecond;
+    e.speedValue.textContent = speed;
+    if (Number(e.speedSlider.value) !== speed) e.speedSlider.value = speed;
 
     if (session.phaseState.spinsLeft !== null && session.phaseState.spinsLeft !== undefined) {
       e.stPanel.classList.remove('hidden');
